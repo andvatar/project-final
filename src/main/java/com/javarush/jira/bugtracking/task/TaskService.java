@@ -19,7 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static com.javarush.jira.bugtracking.ObjectType.TASK;
@@ -130,6 +132,45 @@ public class TaskService {
                 .orElseThrow(() -> new NotFoundException(String
                         .format("Not found assignment with userType=%s for task {%d} for user {%d}", userType, id, userId)));
         assignment.setEndpoint(LocalDateTime.now());
+    }
+
+    @Transactional
+    public void addTag(long id, String tag) {
+        if(tag.length() < 2 || tag.length() > 32) {
+            throw new IllegalArgumentException("The tag cannot be added");
+        }
+        Task task = handler.getRepository().getExisted(id);
+        task.addTag(tag);
+    }
+
+    public Duration getTimeInProgress(long id) {
+        return getTimeBetweenStatuses(id, "in_progress", "ready_for_review");
+    }
+
+    public Duration getTimeInTesting(long id) {
+        return getTimeBetweenStatuses(id, "ready_for_review", "done");
+    }
+
+    private Duration getTimeBetweenStatuses(long id, String startStatusCode, String endStatusCode) {
+        List<Activity> activities = activityHandler.getRepository().findAllByTaskIdOrderByUpdatedAsc(id);
+        LocalDateTime startDateTime = null;
+
+        long diffInMinutes = 0;
+        for (var activity : activities) {
+            if(activity.getStatusCode()!= null && !activity.getStatusCode().isEmpty()) {
+                if(activity.getStatusCode().equals(startStatusCode)) {
+                    startDateTime = activity.getUpdated();
+                } else if (activity.getStatusCode().equals(endStatusCode) && startDateTime != null) {
+                    diffInMinutes += ChronoUnit.MINUTES.between(startDateTime, activity.getUpdated());
+                    startDateTime = null;
+                }
+            }
+        }
+        if(startDateTime != null) {
+            diffInMinutes += ChronoUnit.MINUTES.between(LocalDateTime.now(), startDateTime);
+        }
+
+        return Duration.ofMinutes(diffInMinutes);
     }
 
     private void checkAssignmentActionPossible(long id, String userType, boolean assign) {

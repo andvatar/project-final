@@ -88,6 +88,10 @@ public class Task extends TitleEntity implements HasCode {
         this.statusCode = statusCode;
     }
 
+    public void addTag(String tag) {
+        tags.add(tag);
+    }
+
     @Override
     public String getCode() {
         return typeCode + '-' + id;

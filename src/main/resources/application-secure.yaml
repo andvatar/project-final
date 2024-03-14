@@ -1,0 +1,46 @@
+spring:
+  datasource:
+    url: ${JAVARUSH_DB_URL}
+    username: ${JAVARUSH_DB_USER}
+    password: ${JAVARUSH_DB_PASSWORD}
+
+  mail:
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+          auth: true
+    host: smtp.gmail.com
+    username: ${JAVARUSH_MAIL_USERNAME}
+    password: ${JAVARUSH_MAIL_PASSWORD}
+    port: 587
+
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: ${JAVARUSH_GITHUB_CLIENT_ID}
+            client-secret: ${JAVARUSH_GITHUB_CLIENT_SECRET}
+            scope:
+              - email
+          google:
+            client-id: ${JAVARUSH_GOOGLE_CLIENT_ID}
+            client-secret: ${JAVARUSH_GOOGLE_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
+          gitlab:
+            client-id: ${JAVARUSH_GITLAB_CLIENT_ID}
+            client-secret: ${JAVARUSH_GITLAB_CLIENT_SECRET}
+            client-name: GitLab
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            authorization-grant-type: authorization_code
+            scope: read_user
+        provider:
+          gitlab:
+            authorization-uri: https://gitlab.com/oauth/authorize
+            token-uri: https://gitlab.com/oauth/token
+            user-info-uri: https://gitlab.com/api/v4/user
+            user-name-attribute: email

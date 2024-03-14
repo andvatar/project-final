@@ -20,6 +20,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -149,6 +151,22 @@ public class TaskController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable long id) {
         activityService.delete(id);
+    }
+
+    @PostMapping(path = "/{id}/add-tag", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void addTag(@PathVariable long id, @RequestBody String tag) {
+        taskService.addTag(id, tag);
+    }
+
+    @GetMapping("{id}/time-in-progress")
+    public Duration getTimeInProgress(@PathVariable long id) {
+        return taskService.getTimeInProgress(id);
+    }
+
+    @GetMapping("{id}/time-in-testing")
+    public Duration getTimeInTesting(@PathVariable long id) {
+        return taskService.getTimeInTesting(id);
     }
 
     private record TaskTreeNode(TaskTo taskTo, List<TaskTreeNode> subNodes) implements ITreeNode<TaskTo, TaskTreeNode> {
