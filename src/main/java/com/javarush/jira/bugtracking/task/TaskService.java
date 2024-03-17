@@ -144,14 +144,14 @@ public class TaskService {
     }
 
     public Duration getTimeInProgress(long id) {
-        return getTimeBetweenStatuses(id, "in_progress", "ready_for_review");
+        return getTimeBetweenStatuses(id, "in_progress");
     }
 
     public Duration getTimeInTesting(long id) {
-        return getTimeBetweenStatuses(id, "ready_for_review", "done");
+        return getTimeBetweenStatuses(id, "ready_for_review");
     }
 
-    private Duration getTimeBetweenStatuses(long id, String startStatusCode, String endStatusCode) {
+    private Duration getTimeBetweenStatuses(long id, String startStatusCode) {
         List<Activity> activities = activityHandler.getRepository().findAllByTaskIdOrderByUpdatedAsc(id);
         LocalDateTime startDateTime = null;
 
@@ -160,7 +160,7 @@ public class TaskService {
             if(activity.getStatusCode()!= null && !activity.getStatusCode().isEmpty()) {
                 if(activity.getStatusCode().equals(startStatusCode)) {
                     startDateTime = activity.getUpdated();
-                } else if (activity.getStatusCode().equals(endStatusCode) && startDateTime != null) {
+                } else if (startDateTime != null) {
                     diffInMinutes += ChronoUnit.MINUTES.between(startDateTime, activity.getUpdated());
                     startDateTime = null;
                 }
