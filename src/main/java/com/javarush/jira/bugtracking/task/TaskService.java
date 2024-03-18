@@ -167,7 +167,7 @@ public class TaskService {
             }
         }
         if(startDateTime != null) {
-            diffInMinutes += ChronoUnit.MINUTES.between(LocalDateTime.now(), startDateTime);
+            diffInMinutes += ChronoUnit.MINUTES.between(startDateTime, LocalDateTime.now());
         }
 
         return Duration.ofMinutes(diffInMinutes);
